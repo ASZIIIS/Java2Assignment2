@@ -6,93 +6,96 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class ServerControl implements Runnable{
+public class ServerControl implements Runnable {
     private ServerCheck server;
     private Socket socket;
     private Scanner in;
     private PrintWriter out;
     private int player;
     private boolean turn;
-    private boolean end=false;
+    private boolean end = false;
     private int game;
-    private boolean inqueue=true;
-    public ServerControl(Socket s2){
+    private boolean inqueue = true;
+
+    public ServerControl(Socket s2) {
         try {
-            this.socket=s2;
-            this.in=new Scanner(socket.getInputStream());
+            this.socket = s2;
+            this.in = new Scanner(socket.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     @Override
     public void run() {
         int cmd;
-        while(true) {
+        while (true) {
             if (!in.hasNext()) {
-                if(inqueue){
-                    Server.Print("Disconnected from "+socket.getInetAddress().getHostAddress());
+                if (inqueue) {
+                    Server.Print("Disconnected from " + socket.getInetAddress().getHostAddress());
                     Server.requeue();
-                }else{
-                    Server.Print("Game"+game+":Player"+player+" Disconnect");
+                } else {
+                    Server.Print("Game" + game + ":Player" + player + " Disconnect");
                     server.disconnect(player);
                 }
                 return;
             }
-            if(!end){
+            if (!end) {
                 cmd = Integer.parseInt(in.next());
                 if (cmd >= 0 && cmd < 9) {
-                    Server.Print("Game"+game+":Player"+player+":(" + cmd/3+", "+cmd%3+")");
-                    server.put(cmd,player);
+                    Server.Print("Game" + game + ":Player" + player + ":(" + cmd / 3 + ", " + cmd % 3 + ")");
+                    server.put(cmd, player);
                 }
-                if (cmd==10){
-                    if(inqueue){
-                        Server.Print("Quit from "+socket.getInetAddress().getHostAddress());
+                if (cmd == 10) {
+                    if (inqueue) {
+                        Server.Print("Quit from " + socket.getInetAddress().getHostAddress());
                         Server.requeue();
-                    }else{
-                        Server.Print("Game"+game+":Player"+player+" Quit");
+                    } else {
+                        Server.Print("Game" + game + ":Player" + player + " Quit");
                         server.disconnect(player);
                     }
                     return;
                 }
-            }else{
+            } else {
                 return;
             }
         }
     }
-    public void setServer(ServerCheck sc,boolean t,int g){
+
+    public void setServer(ServerCheck sc, boolean t, int g) {
         try {
-            this.server=sc;
-            this.out=new PrintWriter(socket.getOutputStream());
-            if(t){
-                player=1;
+            this.server = sc;
+            this.out = new PrintWriter(socket.getOutputStream());
+            if (t) {
+                player = 1;
                 out.println(0);
                 out.flush();
-            }else{
-                player=2;
+            } else {
+                player = 2;
                 out.println(1);
                 out.flush();
             }
-            this.turn=t;
-            this.game=g;
-            inqueue=false;
+            this.turn = t;
+            this.game = g;
+            inqueue = false;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
-    public void update(int cmd){
-        turn=!turn;
+    public void update(int cmd) {
+        turn = !turn;
         out.println(cmd);
         out.flush();
     }
 
     public void win(int x) {
-        if(x==1){
+        if (x == 1) {
             out.println(11);
             out.flush();
-        }else if(x==2){
+        } else if (x == 2) {
             out.println(12);
             out.flush();
-        }else if(x==3){
+        } else if (x == 3) {
             out.println(13);
             out.flush();
         }
@@ -107,6 +110,6 @@ public class ServerControl implements Runnable{
     public void end() {
         out.println(16);
         out.flush();
-        end=true;
+        end = true;
     }
 }

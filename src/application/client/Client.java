@@ -8,12 +8,10 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import java.net.Socket;
-import java.util.Scanner;
-
 public class Client extends Application {
     private ClientController controller;
     private ClientControl control;
+
     @Override
     public void start(Stage primaryStage) {
         try {
@@ -31,10 +29,9 @@ public class Client extends Application {
                 }
             });
             primaryStage.show();
-            controller=fxmlLoader.getController();
-            control=controller.create();
-            Thread t=new Thread(control);
-            t.start();
+            controller = fxmlLoader.getController();
+            control = controller.create();
+            new Thread(control).start();
         } catch (Exception e) {
             e.printStackTrace();
         }

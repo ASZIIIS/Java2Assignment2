@@ -1,5 +1,7 @@
 package application.client;
 
+import java.net.URL;
+import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.Pane;
@@ -7,13 +9,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public class ClientController implements Initializable {
     private static final int BOUND = 90;
@@ -39,37 +34,38 @@ public class ClientController implements Initializable {
         game_panel.setOnMouseClicked(event -> {
             int x = (int) (event.getX() / BOUND);
             int y = (int) (event.getY() / BOUND);
-            if(turn){
-                send(x,y);
+            if (turn) {
+                send(x, y);
             }
         });
     }
 
-    public ClientControl create(){
-        control=new ClientControl(this);
+    public ClientControl create() {
+        control = new ClientControl(this);
         return control;
     }
-    public void setPlayer(boolean t){
-        player=t;
-        turn=t;
+
+    public void setPlayer(boolean t) {
+        player = t;
+        turn = t;
     }
 
-    private void send (int x, int y) {
-        int z=x*3+y;
+    private void send(int x, int y) {
+        int z = x * 3 + y;
         control.send(z);
     }
 
-    public void update(int cmd){
-        if(cmd>=0&&cmd<9){
-            if (chessBoard[cmd/3][cmd%3] == 0) {
-                chessBoard[cmd/3][cmd%3] = player!=turn ? 1 : 2;
+    public void update(int cmd) {
+        if (cmd >= 0 && cmd < 9) {
+            if (chessBoard[cmd / 3][cmd % 3] == 0) {
+                chessBoard[cmd / 3][cmd % 3] = player != turn ? 1 : 2;
                 drawChess();
-                turn=!turn;
+                turn = !turn;
             }
         }
     }
 
-    private void drawChess () {
+    private void drawChess() {
         for (int i = 0; i < chessBoard.length; i++) {
             for (int j = 0; j < chessBoard[0].length; j++) {
                 if (flag[i][j]) {

@@ -8,114 +8,114 @@ public class ServerCheck {
 
     private int[][] chessboard;
     private int cnt;
-    private Thread t1;
-    private Thread t2;
-    private boolean end=false;
+    private boolean end = false;
     private int game;
     private boolean requeue;
-    public ServerCheck(ServerControl sc1,ServerControl sc2,int g){
-        this.control1=sc1;
-        this.control2=sc2;
-        control1.setServer(this,true,g);
-        control2.setServer(this,false,g);
-        this.game=g;
-        this.chessboard=new int[3][3];
-        for(int i=0;i<3;++i){
-            for(int j=0;j<3;++j) {
+
+    public ServerCheck(ServerControl sc1, ServerControl sc2, int g) {
+        this.control1 = sc1;
+        this.control2 = sc2;
+        control1.setServer(this, true, g);
+        control2.setServer(this, false, g);
+        this.game = g;
+        this.chessboard = new int[3][3];
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
                 chessboard[i][j] = 0;
             }
         }
-        cnt=0;
+        cnt = 0;
     }
-    public void put(int cmd,int p){
-        if(chessboard[cmd/3][cmd%3]==0){
-            chessboard[cmd/3][cmd%3]=p;
+
+    public void put(int cmd, int p) {
+        if (chessboard[cmd / 3][cmd % 3] == 0) {
+            chessboard[cmd / 3][cmd % 3] = p;
             control1.update(cmd);
             control2.update(cmd);
             cnt++;
-            if(win(cmd/3,cmd%3)){
-                if(p==1){
+            if (win(cmd / 3, cmd % 3)) {
+                if (p == 1) {
                     control1.win(1);
                     control2.win(2);
-                }else{
+                } else {
                     control2.win(1);
                     control1.win(2);
                 }
                 end();
-            }else if(cnt==9){
+            } else if (cnt == 9) {
                 control1.win(3);
                 control2.win(3);
                 end();
             }
         }
     }
-    private boolean win(int x,int y){
+    private boolean win(int x, int y) {
         boolean flag;
         int flag2;
-        int p=chessboard[x][y];
+        int p = chessboard[x][y];
         //line
-        flag=true;
-        for(int i=1;x-i>=0;++i){
-            if(chessboard[x-i][y]!=p){
-                flag=false;
+        flag = true;
+        for (int i = 1; x - i >= 0; ++i) {
+            if (chessboard[x - i][y] != p) {
+                flag = false;
                 break;
             }
         }
-        for(int i=1;x+i<3;++i){
-            if(chessboard[x+i][y]!=p){
-                flag=false;
+        for (int i = 1; x + i < 3; ++i) {
+            if (chessboard[x + i][y] != p) {
+                flag = false;
                 break;
             }
         }
-        if(flag){
+        if (flag) {
             return true;
         }
         //column
-        flag=true;
-        for(int i=1;y-i>=0;++i){
-            if(chessboard[x][y-i]!=p){
-                flag=false;
+        flag = true;
+        for (int i = 1; y - i >= 0; ++i) {
+            if (chessboard[x][y - i] != p) {
+                flag = false;
                 break;
             }
         }
-        for(int i=1;y+i<3;++i){
-            if(chessboard[x][y+i]!=p){
-                flag=false;
+        for (int i = 1; y + i < 3; ++i) {
+            if (chessboard[x][y + i] != p) {
+                flag = false;
                 break;
             }
         }
-        if(flag){
+        if (flag) {
             return true;
         }
-        if(x%2==y%2){
+        if (x % 2 == y % 2) {
             //diagonal
-            flag2=0;
-            for(int i=1;x-i>=0&&y-i>=0;++i){
-                if(chessboard[x-i][y-i]==p){
+            flag2 = 0;
+            for (int i = 1; x - i >= 0 && y - i >= 0; ++i) {
+                if (chessboard[x - i][y - i] == p) {
                     ++flag2;
                 }
             }
-            for(int i=1;x+i<3&&y+i<3;++i){
-                if(chessboard[x+i][y+i]==p){
+            for (int i = 1; x + i < 3 && y + i < 3; ++i) {
+                if (chessboard[x + i][y + i] == p) {
                     ++flag2;
                 }
             }
-            if(flag2==2){
+            if (flag2 == 2) {
                 return true;
             }
             //anti-diagonal
-            flag2=0;
-            for(int i=1;x-i>=0&&y+i<3;++i){
-                if(chessboard[x-i][y+i]==p){
+            flag2 = 0;
+            for (int i = 1; x - i >= 0 && y + i < 3; ++i) {
+                if (chessboard[x - i][y + i] == p) {
                     ++flag2;
                 }
             }
-            for(int i=1;x+i<3&&y-i>=0;++i){
-                if(chessboard[x+i][y-i]==p){
+            for (int i = 1; x + i < 3 && y - i >= 0; ++i) {
+                if (chessboard[x + i][y - i] == p) {
                     ++flag2;
                 }
             }
-            if(flag2==2){
+            if (flag2 == 2) {
                 return true;
             }
         }
@@ -123,29 +123,30 @@ public class ServerCheck {
     }
 
     public void disconnect(int p) {
-        if(p==1){
+        if (p == 1) {
             control2.disconnect();
-        }else{
+        } else {
             control1.disconnect();
         }
         end();
     }
 
     public void end() {
-        if(!end){
-            Server.Print("Game"+game+":Game Over");
+        if (!end) {
+            Server.Print("Game" + game + ":Game Over");
             control1.end();
             control2.end();
-            end=true;
+            end = true;
         }
     }
 
     public void requeue() {
-        requeue=true;
+        requeue = true;
         Server.requeue();
-        end=true;
+        end = true;
     }
-    public boolean getEnd(){
+
+    public boolean getEnd() {
         return end;
     }
 }
